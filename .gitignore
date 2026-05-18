@@ -1,3 +1,4 @@
 .env
 temp.wav
+memory.json
 __pycache__/

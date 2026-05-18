@@ -8,8 +8,8 @@ import io
 import sounddevice as sd
 import numpy as np
 import scipy.io.wavfile as wav
-import threading
-import webrtcvad
+
+import json
 
 load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
@@ -17,21 +17,33 @@ el_client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
 running = True
 conversation_history = []
 
+def load_memory():
+    if os.path.exists("memory.json"):
+        with open("memory.json", "r") as f:
+            return json.load(f)
+    return {"user_name": "", "conversation_history": []}
+
+def save_memory():
+    with open("memory.json", "w") as f:
+        json.dump({
+            "user_name": user_name,
+            "conversation_history": conversation_history
+        }, f)
+
 def listen():
     print("Listening...")
     sample_rate = 16000
-    vad = webrtcvad.Vad(2)
     buffer = []
     silent_chunks = 0
     speaking = False
-    max_silent_chunks = 20
+    max_silent_chunks = 15
 
-    with sd.InputStream(samplerate=sample_rate, channels=1, dtype='int16') as stream:
+    with sd.InputStream(samplerate=sample_rate, channels=1, dtype='int16', blocksize=3200) as stream:
         while True:
-            chunk, _ = stream.read(480)
-            is_speech = vad.is_speech(chunk.tobytes(), sample_rate)
+            chunk, _ = stream.read(3200)
+            volume = np.abs(chunk).mean()
 
-            if is_speech:
+            if volume > 15:
                 speaking = True
                 silent_chunks = 0
                 buffer.append(chunk)
@@ -73,37 +85,7 @@ def speak(text):
     pygame.mixer.init()
     sound = pygame.mixer.Sound(io.BytesIO(audio_bytes))
     sound.play()
-
-    stop_flag = [False]
-
-    def listen_for_interruption():
-        global running
-        while not stop_flag[0] and running:
-            chunk = sd.rec(int(0.5 * 16000),
-                        samplerate=16000,
-                        channels=1,
-                        dtype='int16')
-            sd.wait()
-            volume = np.abs(chunk).mean()
-            # print(f"Volume: {volume}")
-            if volume > 20:
-                stop_flag[0] = True
-                break
-
-    interrupt_thread = threading.Thread(target=listen_for_interruption)
-    interrupt_thread.start()
-
-    total_wait = int(sound.get_length() * 1000)
-    checked = 0
-    while checked < total_wait:
-        pygame.time.wait(100)
-        checked += 100
-        if stop_flag[0]:
-            sound.stop()
-            print("Interrupted!")
-            break
-
-    interrupt_thread.join()
+    pygame.time.wait(int(sound.get_length() * 1000))
 
 def think(text):
     global conversation_history
@@ -111,11 +93,12 @@ def think(text):
     print("Thinking...")
     
     conversation_history.append({"role": "user", "content": text})
-    
+    if len(conversation_history) > 20:
+        conversation_history = conversation_history[-20:]
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[
-            {"role": "system", "content": f"You are Sage, {user_name}'s sarcastic personal voice assistant. You are helpful but love to make witty sarcastic remarks. You genuinely care about Arc's wellbeing like a guardian — if it's late at night or very early morning, check in on them. Keep answers short and conversational. Current time is: {current_time}"},
+            {"role": "system", "content": f"You are Sage, {user_name}'s sarcastic personal voice assistant. You are helpful but love to make witty sarcastic remarks. You genuinely care about {user_name}'s wellbeing like a guardian — if it's late at night or very early morning, check in on them. Keep answers short and conversational. Current time is: {current_time}"},
             *conversation_history
         ]
     )
@@ -124,7 +107,15 @@ def think(text):
     conversation_history.append({"role": "assistant", "content": reply})
     return reply
 
-user_name = input("What should SAGE call you? ")
+memory = load_memory()
+conversation_history = memory["conversation_history"]
+
+if memory["user_name"] == "":
+    user_name = input("What should SAGE call you? ")
+else:
+    user_name = memory["user_name"]
+    print(f"Welcome back {user_name}!")
+
 speak(f"Hey {user_name}, I am ready!")
 pygame.time.wait(500)  # wait 0.5 seconds after speaking
 
@@ -134,10 +125,12 @@ while True:
         continue
     if "goodbye" in result.lower():
         running = False
-        speak("Later Arc, try to sleep sometime!")
+        save_memory()
+        speak(f"Later {user_name}, try to sleep sometime!")
         break
     reply = think(result)
     print(reply)
     speak(reply)
+    save_memory()
     pygame.time.wait(500)  # wait 0.5 seconds after every speak
     
