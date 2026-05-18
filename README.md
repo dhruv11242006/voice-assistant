@@ -11,8 +11,8 @@ Built from scratch in Python. Powered by Groq's insane speed, Llama 3.3's brain,
 - 🎤 **Smart Voice Detection** — starts recording when you speak, stops when you go silent
 - 🧠 **Groq + Llama 3.3** — lightning fast AI responses
 - 🔊 **ElevenLabs TTS** — natural sounding voice output
-- ✋ **Interruption Handling** — talk over it and it stops immediately
-- 💬 **Conversation Memory** — remembers everything said in the current session
+- 💬 **Conversation Memory** — remembers everything across sessions
+- 💾 **Persistent Memory** — remembers your name and chat history forever
 - 😏 **Sarcastic Personality** — checks your wellbeing and roasts you while doing it
 - ⏰ **Time Awareness** — knows what time it is and reacts accordingly
 - 👋 **"Goodbye"** — just say goodbye to exit
