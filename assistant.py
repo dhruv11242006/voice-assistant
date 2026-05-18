@@ -115,7 +115,7 @@ def think(text):
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[
-            {"role": "system", "content": f"You are Arc's sarcastic personal voice assistant. You are helpful but love to make witty sarcastic remarks. You genuinely care about Arc's wellbeing — if it's late at night or very early morning, check in on them. Keep answers short and conversational. Current time is: {current_time}"},
+            {"role": "system", "content": f"You are Sage, {user_name}'s sarcastic personal voice assistant. You are helpful but love to make witty sarcastic remarks. You genuinely care about Arc's wellbeing like a guardian — if it's late at night or very early morning, check in on them. Keep answers short and conversational. Current time is: {current_time}"},
             *conversation_history
         ]
     )
@@ -124,8 +124,8 @@ def think(text):
     conversation_history.append({"role": "assistant", "content": reply})
     return reply
 
-
-speak("Hey Arc, I am ready!")
+user_name = input("What should SAGE call you? ")
+speak(f"Hey {user_name}, I am ready!")
 pygame.time.wait(500)  # wait 0.5 seconds after speaking
 
 while True:

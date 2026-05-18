@@ -2,7 +2,7 @@
 
 > *A sarcastic, fast, always-listening personal voice assistant that actually talks back.*
 
-Built from scratch in Python. Powered by Groq's insane speed, Llama 3.3's brain, and ElevenLabs' voice. No wake word. No button. Just talk.
+Built from scratch in Python. Powered by Groq's insane speed, Llama 3.3's brain, and ElevenLabs' voice. No wake word. No button. No nonsense. Just talk.
 
 ---
 
@@ -64,6 +64,8 @@ Get your free API keys:
 ```bash
 python assistant.py
 ```
+
+SAGE will ask your name on first run and remember it for the session 😄
 
 ---
 
