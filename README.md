@@ -67,10 +67,11 @@ python assistant.py
 
 SAGE will ask your name on first run and remember it for the session 😄
 
----
 ### 5. First run
 
 SAGE will ask your name and create a `memory.json` file automatically — no need to create it manually.
+
+---
 
 ## 💬 Usage
 
