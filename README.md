@@ -68,6 +68,9 @@ python assistant.py
 SAGE will ask your name on first run and remember it for the session 😄
 
 ---
+### 5. First run
+
+SAGE will ask your name and create a `memory.json` file automatically — no need to create it manually.
 
 ## 💬 Usage
 
@@ -81,12 +84,11 @@ Just run it and start talking. SAGE is always listening.
 
 ## 🔮 Roadmap
 
+- [x] Persistent memory across sessions
 - [ ] Web search integration
 - [ ] Weather updates
-- [ ] Persistent memory across sessions
 - [ ] Wake word detection
 - [ ] Reminders and alarms
-
 ---
 
 ## 👤 Author
