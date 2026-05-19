@@ -18,7 +18,7 @@ Built from scratch in Python. Powered by Groq's insane speed, Llama 3.3's brain,
 - 👋 **"Goodbye"** — just say goodbye to exit
 
 ---
-.
+
 ## 🛠️ Tech Stack
 
 | Component | Tool |
